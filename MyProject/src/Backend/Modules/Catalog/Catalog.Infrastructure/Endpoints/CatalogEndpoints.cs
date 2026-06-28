@@ -23,7 +23,9 @@ public static class CatalogEndpoints
                 var ownerId = GetOwnerId(httpContext);
                 var product = await handler.HandleAsync(new GetProductQuery(id, ownerId), ct);
                 return product is null ? Results.NotFound() : Results.Ok(product);
-            });
+            })
+            .WithSummary("Get a product by ID")
+            .WithDescription("Returns the product if it belongs to the authenticated user. Returns 404 if not found or not owned by the caller.");
 
         group.MapGet("/products",
             async (int? page, int? pageSize, HttpContext httpContext, ListProductsHandler handler, CancellationToken ct) =>
@@ -45,7 +47,9 @@ public static class CatalogEndpoints
                 var query = new ListProductsQuery(ownerId, resolvedPage, resolvedPageSize);
                 var result = await handler.HandleAsync(query, ct);
                 return Results.Ok(result);
-            });
+            })
+            .WithSummary("List products")
+            .WithDescription("Returns a paginated list of products belonging to the authenticated user. Supports page and pageSize query parameters (defaults: 1 and 20).");
 
         group.MapPost("/products",
             async (CreateProductCommand command,
@@ -77,7 +81,9 @@ public static class CatalogEndpoints
                 {
                     return Results.Conflict($"A product with SKU '{command.Sku}' already exists.");
                 }
-            });
+            })
+            .WithSummary("Create a product")
+            .WithDescription("Creates a new product for the authenticated user. Validates all fields and checks SKU uniqueness. Returns 201 with the created product, 400 on validation error, or 409 if SKU already exists.");
 
         group.MapPut("/products/{id:long}",
             async (long id,
@@ -101,7 +107,9 @@ public static class CatalogEndpoints
                 var commandWithOwner = command with { OwnerId = GetOwnerId(httpContext) };
                 var product = await handler.HandleAsync(commandWithOwner, ct);
                 return Results.Ok(product);
-            });
+            })
+            .WithSummary("Update a product")
+            .WithDescription("Updates name, description, and price of a product. Ownership check enforced — returns 403 if caller is not the owner, 404 if not found, 400 on validation error.");
 
         group.MapDelete("/products/{id:long}",
             async (long id, HttpContext httpContext, DeleteProductHandler handler, CancellationToken ct) =>
@@ -109,7 +117,9 @@ public static class CatalogEndpoints
                 var ownerId = GetOwnerId(httpContext);
                 await handler.HandleAsync(new DeleteProductCommand(id, ownerId), ct);
                 return Results.NoContent();
-            });
+            })
+            .WithSummary("Delete a product")
+            .WithDescription("Deletes the product if the authenticated user is the owner. Returns 204 on success, 403 if not the owner, 404 if not found.");
 
         group.MapPatch("/products/{id:long}/stock",
             async (long id, int quantity, HttpContext httpContext, UpdateProductStockHandler handler, CancellationToken ct) =>
@@ -124,7 +134,9 @@ public static class CatalogEndpoints
                     new UpdateProductStockCommand(id, quantity, ownerId), ct);
 
                 return Results.Ok(product);
-            });
+            })
+            .WithSummary("Update product stock")
+            .WithDescription("Sets the stock quantity of a product. Ownership check enforced. Quantity must not be negative. Returns 403 if not the owner, 404 if not found.");
 
         return routes;
     }

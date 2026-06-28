@@ -1,4 +1,4 @@
-@ApiGateway_HostAddress = http://localhost:5019
+@ApiGateway_HostAddress = http://localhost:5000
 
 ### List all products (requires Host.Api running on port 5085)
 GET {{ApiGateway_HostAddress}}/api/catalog/products?page=1&pageSize=10
