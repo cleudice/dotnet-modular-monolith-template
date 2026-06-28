@@ -141,6 +141,16 @@ public static class CatalogEndpoints
         return routes;
     }
 
-    private static string GetOwnerId(HttpContext httpContext) =>
-        httpContext.Request.Headers[OwnerIdHeader].FirstOrDefault() ?? DefaultOwnerId;
+    private static string GetOwnerId(HttpContext httpContext)
+    {
+        // Prefer JWT sub claim when authenticated
+        var subClaim = httpContext.User.FindFirst("sub")?.Value;
+        if (!string.IsNullOrWhiteSpace(subClaim))
+        {
+            return subClaim;
+        }
+
+        // Fallback to X-User-Id header (dev convenience)
+        return httpContext.Request.Headers[OwnerIdHeader].FirstOrDefault() ?? DefaultOwnerId;
+    }
 }

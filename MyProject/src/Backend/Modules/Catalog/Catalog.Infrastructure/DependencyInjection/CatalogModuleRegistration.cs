@@ -19,8 +19,12 @@ public static class CatalogModuleRegistration
             ?? throw new InvalidOperationException(
                 "Connection string 'Default' not found. Ensure appsettings.json contains ConnectionStrings:Default.");
 
+        services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+
         services.AddDbContext<CatalogDbContext>(options =>
             options.UseNpgsql(connectionString));
+
+        services.AddHostedService<OutboxBackgroundService<CatalogDbContext>>();
 
         services.AddScoped<IUnitOfWork>(sp =>
             sp.GetRequiredService<CatalogDbContext>());

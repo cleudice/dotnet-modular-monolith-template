@@ -8,12 +8,22 @@ public abstract class AppDbContext(DbContextOptions options) : DbContext(options
 {
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        await DispatchDomainEventsAsync().ConfigureAwait(false);
-        return result;
+        CaptureOutboxMessages();
+        return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task DispatchDomainEventsAsync()
+    public override int SaveChanges()
+    {
+        CaptureOutboxMessages();
+        return base.SaveChanges();
+    }
+
+    /// <summary>
+    /// Collects domain events from tracked aggregate roots, serializes them
+    /// into <see cref="OutboxMessage"/> entries, and clears the events.
+    /// The outbox messages are persisted in the same transaction as the entity changes.
+    /// </summary>
+    private void CaptureOutboxMessages()
     {
         var aggregates = ChangeTracker
             .Entries<AggregateRoot>()
@@ -23,15 +33,12 @@ public abstract class AppDbContext(DbContextOptions options) : DbContext(options
 
         foreach (var aggregate in aggregates)
         {
-            var events = aggregate.DomainEvents.ToList();
-            aggregate.ClearDomainEvents();
-
-            foreach (var domainEvent in events)
+            foreach (var domainEvent in aggregate.DomainEvents)
             {
-                // TODO: Resolve IDomainEventDispatcher and dispatch each event.
-                // For the template, events are collected and cleared — dispatch is a future concern.
-                await Task.CompletedTask;
+                Set<OutboxMessage>().Add(OutboxMessage.FromDomainEvent(domainEvent));
             }
+
+            aggregate.ClearDomainEvents();
         }
     }
 }

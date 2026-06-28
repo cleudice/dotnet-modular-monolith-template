@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Modules.Catalog.Domain;
 
 public readonly record struct Price
@@ -22,7 +24,7 @@ public readonly record struct Price
         Value = value;
     }
 
-    public override string ToString() => Value.ToString("F2");
+    public override string ToString() => Value.ToString("F2", CultureInfo.InvariantCulture);
 
     public static implicit operator decimal(Price price) => price.Value;
 }

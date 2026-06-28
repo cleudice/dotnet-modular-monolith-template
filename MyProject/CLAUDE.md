@@ -50,6 +50,50 @@ Controle em `Program.cs`: `MapOpenApi()` sempre ativo, `MapScalarApiReference()`
 - XML docs habilitados: `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
 - Spec resultante contém descrições para consumidores externos
 
+## Health checks
+
+```bash
+curl http://localhost:5000/health        # Liveness
+curl http://localhost:5000/health/ready   # Readiness (DB check)
+```
+
+## Observabilidade
+
+- **Serilog** — structured JSON logging (Console). Dev: formato legível, Prod: JSON.
+- Config em `appsettings.json` → `Serilog` section.
+- Health checks com `AddHealthChecks()` + `AddDbContextCheck<CatalogDbContext>()`.
+
+## Qualidade
+
+- `TreatWarningsAsErrors=true` — zero warnings em Release.
+- CA1707 (underscores em nomes de teste) suprimido em `Backend.Tests.csproj`.
+- `EnforceCodeStyleInBuild=true` + `AnalysisLevel=latest-recommended`.
+
+## Outbox Pattern
+
+- **Shared**: `OutboxMessage` (entidade), `AppDbContext.CaptureOutboxMessages()`, `OutboxBackgroundService<TContext>` (BackgroundService)
+- **Per module**: cada DbContext ganha `DbSet<OutboxMessage>` → tabela isolada no schema do módulo
+- **Fluxo**: SaveChanges → serializa domain events → salva na tabela OutboxMessages (mesma transação) → BackgroundService processa via IDomainEventDispatcher
+- **Sem duplicação**: lógica de captura no `AppDbContext` base, processamento genérico `OutboxBackgroundService<TContext>`
+- **Registro**: `services.AddHostedService<OutboxBackgroundService<CatalogDbContext>>()`
+
+## Autenticação
+
+- **JWT Bearer**: Configurar `Jwt:Key` no `.env` → JWT `sub` claim vira OwnerId.
+- **Dev fallback**: Sem `Jwt:Key` configurado, usa header `X-User-Id` (default: `anonymous`).
+- **Transição**: `GetOwnerId()` em `CatalogEndpoints.cs` prefere JWT, fallback X-User-Id.
+
+## Testes
+
+```bash
+# Unitários (InMemory, rápidos)
+dotnet test --filter "FullyQualifiedName~ProductRepositoryTests"
+
+# Integração (PostgreSQL real via Testcontainers — requer Docker)
+DOCKER_HOST=unix:///run/user/1000/podman/podman.sock \
+  dotnet test --filter "FullyQualifiedName~ProductRepositoryIntegrationTests"
+```
+
 ## Portas
 
 | Serviço | HTTP | HTTPS |

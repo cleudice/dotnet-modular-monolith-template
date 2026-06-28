@@ -92,5 +92,6 @@ public class ProductRepositoryTests : IDisposable
     public void Dispose()
     {
         _dbContext.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

@@ -25,6 +25,15 @@ Base URL: `http://localhost:5100` (HTTP only — HTTPS redirect removed; gateway
 
 Owner identification: `X-User-Id` request header (temporary — replace with JWT claims when auth is implemented). Default: `"anonymous"`. YARP forwards all headers transparently, so the header reaches Host.Api unchanged.
 
+## Health checks
+
+| Endpoint | Purpose |
+|----------|---------|
+| `/health` | Liveness — app is alive |
+| `/health/ready` | Readiness — DB connected, ready for traffic |
+
+Both accessible via gateway (`http://localhost:5000/health`).
+
 ## API Documentation
 
 | Resource | URL (via Gateway) | Dev | Produção |

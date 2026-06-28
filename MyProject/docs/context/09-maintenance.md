@@ -11,6 +11,7 @@
 - **`X-User-Id` header is temporary.** Replace with JWT `sub` claim when real authentication is implemented. The `GetOwnerId()` helper in `CatalogEndpoints` is the single point to change.
 - **InMemory provider in tests does not enforce unique indexes.** `ProductRepositoryTests` passes but would fail against real PostgreSQL if SKU uniqueness is violated. Use Testcontainers for true integration tests.
 - **Connection string via `.env` file.** Copy `.env.example` to `.env` in `src/Backend/Host.Api/`. Falls back to user-secrets or environment variables. The `.env` file is gitignored.
+- **`TreatWarningsAsErrors=true` enforces zero-warning builds.** CA1707 (test name underscores) suppressed in `Backend.Tests.csproj`. CA1848 (LoggerMessage delegates) suppressed in `Host.Api.csproj`. Add new suppressions sparingly — fix the code first.
 
 ## Tech debt
 
@@ -21,11 +22,11 @@
 | Docker | ~~Empty~~ ✅ Multi-stage Dockerfiles (Host.Api, ApiGateway), docker-compose.yml funcional | — |
 | CI/CD | ~~Empty~~ ✅ backend-ci.yml (build+test), backend-cd.yml (publish GHCR) | — |
 | Frontend | package.json is empty — stack not chosen | Low |
-| Health checks | Not implemented | Medium |
-| CORS | Not configured | Medium (needed when frontend is added) |
-| Auth | `X-User-Id` header — no real auth | High (before production) |
-| Domain events | Dispatch is a stub | Medium (needed for cross-module features) |
-| README | Does not exist | High (for open-source template) |
+| Health checks | ~~Not implemented~~ ✅ /health (liveness), /health/ready (readiness + DB) | — |
+| CORS | ~~Not configured~~ ✅ Dev: AllowAny, Prod: configurable origins | — |
+| Auth | ~~`X-User-Id` header~~ ✅ JWT Bearer + X-User-Id fallback | — |
+| Domain events | ~~Dispatch is a stub~~ ✅ Outbox pattern — per-module table, shared BackgroundService, serializa JSON | — |
+| README | ~~Does not exist~~ ✅ README.md at repo root | — |
 
 ## Versions & support
 
@@ -39,5 +40,8 @@
 | FluentValidation | 12.1.1 | |
 | FluentAssertions | 8.10.0 | |
 | xUnit | 2.9.3 | |
+| YARP | 2.3.0 | Reverse proxy |
+| Scalar | 2.1.0 | API docs UI |
+| Serilog | 9.0.0 | Structured logging |
 
 All packages are latest stable as of June 2026. Check for updates quarterly.
