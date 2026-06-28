@@ -29,7 +29,7 @@ None. All ten axes apply.
 | Module | A vertical business capability (Catalog, Ordering) with its own Domain/Application/Infrastructure layers |
 | BuildingBlocks | Shared kernel — base classes and cross-cutting infrastructure reused by all modules |
 | Host.Api | Composition root — the ASP.NET Core host that registers all modules and starts the application |
-| ApiGateway | Separate lightweight entry point (placeholder — currently boilerplate weather forecast) |
+| ApiGateway | YARP reverse proxy (port 5019) — single entry point that routes `/api/*` to Host.Api |
 | Value Object | Immutable `readonly record struct` with self-validation — ProductName, Sku, Price |
 | IHasOwner | Interface marking entities that belong to a user (`string OwnerId`) |
 | CatalogNotFoundException | Typed domain exception mapped to HTTP 404 by middleware |

@@ -1,6 +1,46 @@
 @ApiGateway_HostAddress = http://localhost:5019
 
-GET {{ApiGateway_HostAddress}}/weatherforecast/
+### List all products (requires Host.Api running on port 5085)
+GET {{ApiGateway_HostAddress}}/api/catalog/products?page=1&pageSize=10
+X-User-Id: test-user
 Accept: application/json
+
+### Get product by ID
+GET {{ApiGateway_HostAddress}}/api/catalog/products/1
+X-User-Id: test-user
+Accept: application/json
+
+### Create product
+POST {{ApiGateway_HostAddress}}/api/catalog/products
+X-User-Id: test-user
+Content-Type: application/json
+
+{
+  "name": "Test Product",
+  "description": "A product created via gateway",
+  "price": 29.99,
+  "sku": "GW-TEST-001",
+  "stockQuantity": 100
+}
+
+### Update product
+PUT {{ApiGateway_HostAddress}}/api/catalog/products/1
+X-User-Id: test-user
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "Updated Product",
+  "description": "Updated via gateway",
+  "price": 39.99
+}
+
+### Update stock
+PATCH {{ApiGateway_HostAddress}}/api/catalog/products/1/stock?quantity=50
+X-User-Id: test-user
+
+### Delete product
+DELETE {{ApiGateway_HostAddress}}/api/catalog/products/1
+X-User-Id: test-user
 
 ###

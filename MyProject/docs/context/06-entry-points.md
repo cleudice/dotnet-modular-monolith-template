@@ -2,9 +2,17 @@
 
 > Load this when: locating where a flow begins.
 
-## Host.Api endpoints
+## ApiGateway (YARP Reverse Proxy)
 
-Base URL: `http://localhost:5085` (HTTP) / `https://localhost:7195` (HTTPS)
+**Primary entry point.** Base URL: `http://localhost:5019` (HTTP) / `https://localhost:7227` (HTTPS)
+
+All external traffic enters through the gateway. YARP reverse proxy routes `/api/{**catch-all}` to Host.Api (`http://localhost:5085/`). The gateway is a thin proxy — no business logic, no module references, no database access. TLS termination happens here.
+
+Requests flow: Client → ApiGateway:5019 → Host.Api:5085 → Module endpoints
+
+## Host.Api endpoints (internal)
+
+Base URL: `http://localhost:5085` (HTTP only — HTTPS redirect removed; gateway handles TLS).
 
 | Method | Route | Handler | Auth | What it does |
 |--------|-------|---------|------|--------------|
@@ -15,15 +23,7 @@ Base URL: `http://localhost:5085` (HTTP) / `https://localhost:7195` (HTTPS)
 | DELETE | `/api/catalog/products/{id}` | DeleteProductHandler | OwnerId header | Deletes product (ownership check) |
 | PATCH | `/api/catalog/products/{id}/stock?quantity=N` | UpdateProductStockHandler | OwnerId header | Adjusts stock quantity (ownership check) |
 
-Owner identification: `X-User-Id` request header (temporary — replace with JWT claims when auth is implemented). Default: `"anonymous"`.
-
-## ApiGateway endpoints
-
-Base URL: `http://localhost:5019`
-
-| Method | Route | Purpose |
-|--------|-------|---------|
-| GET | `/weatherforecast` | Boilerplate sample from `dotnet new` — not production |
+Owner identification: `X-User-Id` request header (temporary — replace with JWT claims when auth is implemented). Default: `"anonymous"`. YARP forwards all headers transparently, so the header reaches Host.Api unchanged.
 
 ## Jobs / events
 

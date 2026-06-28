@@ -17,7 +17,7 @@
 | Area | Debt | Priority |
 |------|------|----------|
 | Ordering module | Class1.cs placeholders — no implementation | Low (template placeholder) |
-| ApiGateway | Weather forecast boilerplate — should be YARP reverse proxy | Low |
+| ApiGateway | ~~Weather forecast boilerplate — should be YARP reverse proxy~~ ✅ Done — YARP 2.3.0, routes `/api/*` to Host.Api:5085 | — |
 | Docker | All Dockerfiles and docker-compose.yml are empty | Medium |
 | CI/CD | GitHub Actions workflow files are empty | Medium |
 | Frontend | package.json is empty — stack not chosen | Low |
