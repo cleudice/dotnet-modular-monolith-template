@@ -2,34 +2,47 @@
 
 > Load this when: auth, sensitive data, or security review.
 
-## Authentication (per subsystem)
+## Authentication
 
 | Subsystem | Mechanism |
 |-----------|-----------|
-| Host.Api | `X-User-Id` header (temporary placeholder). No JWT/OAuth/OIDC yet. |
-| ApiGateway | None (boilerplate only) |
+| Host.Api | JWT Bearer (primary) + `X-User-Id` header fallback (dev). JWT disabled if `Jwt:Key` is empty — uses header only. |
+| ApiGateway | None (transparent proxy — forwards Authorization and X-User-Id headers) |
 
-**Future:** Replace `X-User-Id` header with JWT Bearer token. The `GetOwnerId()` helper in `CatalogEndpoints` is a single extraction point — replace it with `httpContext.User.FindFirst("sub")?.Value` when auth is added.
+**JWT config:** `Jwt:Issuer`, `Jwt:Audience`, `Jwt:Key` in `.env`. Symmetric signing key. `GetOwnerId()` in `CatalogEndpoints` prefers JWT `sub` claim, falls back to `X-User-Id` header, defaults to `"anonymous"`.
 
 ## Authorization
 
-- **Ownership-based:** Every write operation (Update, Delete, UpdateStock) checks `product.OwnerId == command.OwnerId`. Mismatch → `CatalogForbiddenException` → 403.
-- **Read isolation:** `GetProductHandler` returns `null` (→ 404) if OwnerId doesn't match, avoiding information leakage about other users' products. `ListProductsHandler` filters by OwnerId at the query level.
-- **No role-based authorization yet.** Admin cross-owner visibility is not implemented.
+- **Ownership-based:** Every write operation checks `product.OwnerId == command.OwnerId`. Mismatch → `CatalogForbiddenException` → 403.
+- **Read isolation:** `GetProductHandler` returns `null` (→ 404) if OwnerId doesn't match. `ListProductsHandler` filters by OwnerId at query level.
+- **No role-based authorization yet.**
+
+## Rate Limiting
+
+Fixed window: 100 requests per minute, queue of 10. Excess → 429 Too Many Requests. Configured in `Program.cs` via `AddRateLimiter`. Applied globally via `UseRateLimiter()` middleware.
+
+## CORS
+
+- **Development:** `AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()` (open for local dev).
+- **Production:** Configurable origins via `Cors:AllowedOrigins` in `appsettings.json`. Empty by default — no cross-origin requests allowed until configured.
 
 ## Secret locations (location only — never the value)
 
 | Secret | Where | Consumed by |
 |--------|-------|-------------|
-| `ConnectionStrings:Default` | `dotnet user-secrets` (dev) / env var (prod) | `CatalogModuleRegistration.AddCatalogModule()` |
-| UserSecretsId | `Host.Api.csproj` (`642e34a4-...`) | `dotnet user-secrets` tool |
+| `ConnectionStrings:Default` | `.env` (dev) / env var (prod) | `CatalogModuleRegistration.AddCatalogModule()` |
+| `Jwt:Key` | `.env` (dev) / env var (prod) | `Program.cs` JWT setup |
+| GITHUB_TOKEN | GitHub Actions secrets | `backend-cd.yml` → GHCR login |
+| UserSecretsId `642e34a4-...` | `Host.Api.csproj` | `dotnet user-secrets` tool |
 
-No secrets in committed files. `appsettings.json` has an empty connection string placeholder.
+No secrets in committed files. `appsettings.json` has empty connection string and empty JWT key.
 
 ## Attack surface
 
-- **SQL injection:** Low risk. All database access is parameterized — EF Core generates parameterized SQL; Dapper uses `CommandDefinition` with anonymous parameters (never string concatenation).
-- **SKU enumeration:** `GetBySkuAsync` is used internally but not exposed as a public endpoint — no SKU enumeration vector.
-- **Mass assignment:** Commands are immutable `record` types with explicit properties. Endpoints construct commands from request body + extracted OwnerId (not from raw request).
+- **SQL injection:** Low — all DB access parameterized (EF Core + Dapper `CommandDefinition`).
+- **SKU enumeration:** `GetBySkuAsync` internal only — no public endpoint, no enumeration vector.
+- **Mass assignment:** Commands are immutable `record` types with explicit properties. OwnerId set server-side from auth context, not request body.
 - **No file upload, no XSS surface** (JSON API, no HTML rendering).
 - **No CSRF surface** (stateless API, no cookies).
+- **Rate limiting** prevents brute-force and DoS.
+- **Gateway TLS termination** — Host.Api HTTP-only (not exposed externally).

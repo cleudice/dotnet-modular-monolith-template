@@ -13,7 +13,7 @@ An open-source .NET 10.0 modular monolith template with Clean Architecture, DDD 
 |------|-------|------|
 | src/Backend/Host.Api | ASP.NET Core 10.0 + Scalar | Composition root — wires DI, registers modules, serves API docs via Scalar |
 | src/Backend/ApiGateway | ASP.NET Core 10.0 + YARP 2.3.0 | Reverse proxy — routes `/api/*`, `/openapi/*`, `/scalar/*` to Host.Api, TLS termination |
-| src/Backend/BuildingBlocks | .NET 10.0 class libraries | Shared kernel — Entity, ValueObject, AggregateRoot, AppDbContext, IUnitOfWork |
+| src/Backend/BuildingBlocks | .NET 10.0 class libraries | Shared kernel — Entity, ValueObject, AggregateRoot, AppDbContext, OutboxMessage, OutboxBackgroundService<T> |
 | src/Backend/Modules/Catalog | .NET 10.0 class libraries | Product catalog — full CRUD with ownership |
 | src/Backend/Modules/Ordering | .NET 10.0 class libraries | Order management (placeholder — Class1.cs only) |
 | src/Frontend | Node/JS (placeholder) | Empty package.json — frontend stack not yet chosen |

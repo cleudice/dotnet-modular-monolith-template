@@ -27,11 +27,14 @@ None. All ten axes apply.
 | Term | Meaning |
 |------|---------|
 | Module | A vertical business capability (Catalog, Ordering) with its own Domain/Application/Infrastructure layers |
-| BuildingBlocks | Shared kernel — base classes and cross-cutting infrastructure reused by all modules |
-| Host.Api | Composition root — the ASP.NET Core host that registers all modules and starts the application |
-| ApiGateway | YARP reverse proxy (port 5019) — single entry point that routes `/api/*` to Host.Api |
+| BuildingBlocks | Shared kernel — base classes, OutboxMessage, OutboxBackgroundService<T>, DomainEventDispatcher |
+| Host.Api | Composition root — ASP.NET Core host, wires DI, Serilog, JWT, rate limiting, health checks |
+| ApiGateway | YARP reverse proxy (port 5000) — single entry point, TLS termination, no module references |
 | Value Object | Immutable `readonly record struct` with self-validation — ProductName, Sku, Price |
 | IHasOwner | Interface marking entities that belong to a user (`string OwnerId`) |
-| CatalogNotFoundException | Typed domain exception mapped to HTTP 404 by middleware |
-| CatalogForbiddenException | Typed domain exception mapped to HTTP 403 when ownership check fails |
-| CatalogValidationException | Typed domain exception mapped to HTTP 400 for domain rule violations |
+| OutboxMessage | Serialized domain event stored in per-module table, processed by background service |
+| OutboxBackgroundService<T> | Generic BackgroundService that polls a module's OutboxMessages, dispatches to handlers |
+| IDomainEventHandler<T> | Interface for reacting to domain events (no MediatR) |
+| CatalogNotFoundException | Typed domain exception mapped to HTTP 404 |
+| CatalogForbiddenException | Typed domain exception mapped to HTTP 403 |
+| CatalogValidationException | Typed domain exception mapped to HTTP 400 |

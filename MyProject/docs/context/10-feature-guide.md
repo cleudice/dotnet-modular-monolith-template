@@ -28,9 +28,9 @@ Add to `MyProject.slnx` and reference from `Host.Api.csproj`.
 - `Validation/` — FluentValidation validators per command
 
 ### 4. Infrastructure layer
-- `Data/` — `DbContext` extending `AppDbContext`, repository implementing domain interface, Dapper queries class
+- `Data/` — `DbContext` extending `AppDbContext`, repository implementing domain interface, Dapper queries class. Add `DbSet<OutboxMessage>` and configure `modelBuilder.Entity<OutboxMessage>()` for the module's outbox table.
 - `Endpoints/` — `MapNewModuleEndpoints(this IEndpointRouteBuilder)` with Minimal API group
-- `DependencyInjection/` — `AddNewModuleModule(this IServiceCollection, IConfiguration)` registering all DI
+- `DependencyInjection/` — `AddNewModuleModule(this IServiceCollection, IConfiguration)` registering all DI, plus `AddHostedService<OutboxBackgroundService<NewModuleDbContext>>()`
 
 ### 5. Wire up in Host.Api
 ```csharp
@@ -44,7 +44,14 @@ app.MapNewModuleEndpoints();
 ### 6. Tests
 - `tests/Backend.Tests/NewModule/Domain/` — entity and value object tests
 - `tests/Backend.Tests/NewModule/Application/` — validator tests
-- `tests/Backend.Tests/NewModule/Infrastructure/` — repository integration tests (InMemory provider)
+- `tests/Backend.Tests/NewModule/Infrastructure/` — repository integration tests (InMemory + Testcontainers PostgreSQL)
+
+### 7. Domain events (if module needs to publish events)
+1. Define event: `record SomethingHappened(...) : IDomainEvent`
+2. Raise in aggregate: `AddDomainEvent(new SomethingHappened(...))`
+3. SaveChanges captures it into `OutboxMessages` automatically (via `AppDbContext.CaptureOutboxMessages()`)
+4. Handler in another module: `class WhenSomethingHappened : IDomainEventHandler<SomethingHappened> { ... }`
+5. Handler auto-discovered by `DomainEventDispatcher` via `IServiceProvider`
 
 ## Cross-cutting checklist
 

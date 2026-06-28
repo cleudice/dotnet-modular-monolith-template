@@ -47,7 +47,20 @@ Run `dotnet format style` before committing (note: .NET 10.0 `dotnet format` has
 9. **CancellationToken** propagated through all async chains
 10. **ConfigureAwait(false)** in library code (BuildingBlocks projects)
 
+## Required patterns (cont.)
+
+11. **Outbox per module** — each module's DbContext has `DbSet<OutboxMessage>`, table `{schema}.OutboxMessages`. Register `AddHostedService<OutboxBackgroundService<TDbContext>>()`. Shared `OutboxMessage` and `OutboxBackgroundService<TContext>` live in BuildingBlocks — zero code duplication.
+12. **Domain event handlers** implement `IDomainEventHandler<T>` (BuildingBlocks.Application). No MediatR. Handlers are scoped, resolved via `IServiceProvider` in `DomainEventDispatcher`.
+13. **`TreatWarningsAsErrors`** enforced globally (`Directory.Build.props`). Suppressions documented per csproj (`NoWarn`) for intentional violations (CA1707 in test naming, CA1848 in dispatchers, CA1711 for EventHandler suffix).
+
 ## Known prohibitions
+
+- No secrets in committed files — use `.env` (dev) or environment variables (prod)
+- No `async void` — always `async Task`
+- No `.Result` or `.Wait()` on tasks
+- No empty catch blocks
+- No magic numbers — use named constants from value objects or entity classes
+- No direct module-to-module references — use domain events via outbox
 
 - No secrets in committed config files — use `dotnet user-secrets` for development
 - No `async void` — always `async Task`
