@@ -1,0 +1,15 @@
+<Solution>
+  <Project Path="BuildingBlocks/BuildingBlocks.Domain/BuildingBlocks.Domain.csproj" />
+  <Project Path="BuildingBlocks/BuildingBlocks.Application/BuildingBlocks.Application.csproj" />
+  <Project Path="BuildingBlocks/BuildingBlocks.Infrastructure/BuildingBlocks.Infrastructure.csproj" />
+  <Project Path="Modules/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
+  <Project Path="Modules/Catalog/Catalog.Application/Catalog.Application.csproj" />
+  <Project Path="Modules/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
+  <Project Path="Modules/Ordering/Ordering.Domain/Ordering.Domain.csproj" />
+  <Project Path="Modules/Ordering/Ordering.Application/Ordering.Application.csproj" />
+  <Project Path="Modules/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj" />
+  <Project Path="ApiGateway/ApiGateway.csproj" />
+  <Project Path="Host.Api/Host.Api.csproj" />
+  <Project Path="../../tests/Backend.Tests/Backend.Tests.csproj" />
+  <Project Path="../../tests/Frontend.Tests/Frontend.Tests.csproj" />
+</Solution>
