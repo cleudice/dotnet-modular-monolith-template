@@ -5,7 +5,7 @@
 
 ## What it is
 
-An open-source .NET 10.0 modular monolith template with Clean Architecture, DDD tactical patterns, CQRS (hand-rolled, no MediatR), Minimal APIs, EF Core (writes) + Dapper (reads), FluentValidation, and manual mapping. Two business modules: Catalog (fully implemented) and Ordering (placeholder).
+An open-source .NET 10.0 modular monolith template with Clean Architecture, DDD tactical patterns, CQRS (hand-rolled, no MediatR), Minimal APIs, EF Core (writes) + Dapper (reads), FluentValidation, Outbox pattern, YARP gateway, JWT auth, and Serilog. Catalog module included as reference implementation. New modules scaffolded via `./scripts/add-module.sh`.
 
 ## Subsystems
 
@@ -15,10 +15,19 @@ An open-source .NET 10.0 modular monolith template with Clean Architecture, DDD 
 | src/Backend/ApiGateway | ASP.NET Core 10.0 + YARP 2.3.0 | Reverse proxy — routes `/api/*`, `/openapi/*`, `/scalar/*` to Host.Api, TLS termination |
 | src/Backend/BuildingBlocks | .NET 10.0 class libraries | Shared kernel — Entity, ValueObject, AggregateRoot, AppDbContext, OutboxMessage, OutboxBackgroundService<T> |
 | src/Backend/Modules/Catalog | .NET 10.0 class libraries | Product catalog — full CRUD with ownership |
-| src/Backend/Modules/Ordering | .NET 10.0 class libraries | Order management (placeholder — Class1.cs only) |
 | src/Frontend | Node/JS (placeholder) | Empty package.json — frontend stack not yet chosen |
 | tests/Backend.Tests | xUnit + FluentAssertions + Testcontainers | 28 tests — unit (InMemory) + integration (real PostgreSQL) |
 | .github/workflows | GitHub Actions | backend-ci.yml (build+test), backend-cd.yml (publish to GHCR), frontend-ci.yml (placeholder) |
+| .template.config | dotnet new template | template.json — sourceName=MyProject, symbols: EnableJwt, ModuleName |
+| scripts/add-module.sh | Bash script | Scaffolds new business module from Catalog pattern |
+
+## Template
+
+```bash
+dotnet new install .                    # Install template
+dotnet new modular-monolith -n MyApp    # Create project
+cd MyApp && ./scripts/add-module.sh Orders  # Add module
+```
 
 ## Docker
 

@@ -13,9 +13,6 @@ COPY src/Backend/BuildingBlocks/BuildingBlocks.Infrastructure/*.csproj src/Backe
 COPY src/Backend/Modules/Catalog/Catalog.Domain/*.csproj src/Backend/Modules/Catalog/Catalog.Domain/
 COPY src/Backend/Modules/Catalog/Catalog.Application/*.csproj src/Backend/Modules/Catalog/Catalog.Application/
 COPY src/Backend/Modules/Catalog/Catalog.Infrastructure/*.csproj src/Backend/Modules/Catalog/Catalog.Infrastructure/
-COPY src/Backend/Modules/Ordering/Ordering.Domain/*.csproj src/Backend/Modules/Ordering/Ordering.Domain/
-COPY src/Backend/Modules/Ordering/Ordering.Application/*.csproj src/Backend/Modules/Ordering/Ordering.Application/
-COPY src/Backend/Modules/Ordering/Ordering.Infrastructure/*.csproj src/Backend/Modules/Ordering/Ordering.Infrastructure/
 COPY src/Backend/Host.Api/*.csproj src/Backend/Host.Api/
 
 RUN dotnet restore src/Backend/Host.Api/Host.Api.csproj

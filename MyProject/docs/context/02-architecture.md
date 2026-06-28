@@ -23,9 +23,9 @@
 - **Typed Exceptions** — `CatalogValidationException` (400), `CatalogNotFoundException` (404), `CatalogForbiddenException` (403). Mapped by `DomainExceptionHandler` (IExceptionHandler middleware).
 - **Manual Mapping** — `ProductMappings.ToDto()` extension method. No AutoMapper/Mapster.
 
-### Ordering Module (placeholder)
+### Adding a new module
 
-All three projects contain only `Class1.cs` stubs. Follow the Catalog pattern when implementing. Adding a new module is ~6 steps (see 10-feature-guide.md).
+Run `./scripts/add-module.sh <ModuleName>` to scaffold a new module from the Catalog pattern. The script copies the project structure, updates the solution file, and adds the Host.Api reference. See `10-feature-guide.md` for the manual steps if preferred.
 
 ### BuildingBlocks (shared kernel)
 

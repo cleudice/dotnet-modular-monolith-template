@@ -17,7 +17,6 @@
 
 | Area | Debt | Priority |
 |------|------|----------|
-| Ordering module | Class1.cs placeholders — no implementation | Low (template placeholder) |
 | ApiGateway | ~~Weather forecast boilerplate~~ ✅ YARP 2.3.0, routes `/api/*`, `/openapi/*`, `/scalar/*` to Host.Api | — |
 | Docker | ~~Empty~~ ✅ Multi-stage Dockerfiles (Host.Api, ApiGateway), docker-compose.yml funcional | — |
 | CI/CD | ~~Empty~~ ✅ backend-ci.yml (build+test), backend-cd.yml (publish GHCR) | — |

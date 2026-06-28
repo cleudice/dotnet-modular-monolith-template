@@ -26,7 +26,7 @@ None. All ten axes apply.
 
 | Term | Meaning |
 |------|---------|
-| Module | A vertical business capability (Catalog, Ordering) with its own Domain/Application/Infrastructure layers |
+| Module | A vertical business capability (Catalog, etc.) with its own Domain/Application/Infrastructure layers. Scaffold via `./scripts/add-module.sh`. |
 | BuildingBlocks | Shared kernel — base classes, OutboxMessage, OutboxBackgroundService<T>, DomainEventDispatcher |
 | Host.Api | Composition root — ASP.NET Core host, wires DI, Serilog, JWT, rate limiting, health checks |
 | ApiGateway | YARP reverse proxy (port 5000) — single entry point, TLS termination, no module references |

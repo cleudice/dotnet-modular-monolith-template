@@ -14,7 +14,9 @@ This is an **open-source template** for building modular monoliths in .NET 10.0.
 | src/Backend/ApiGateway | Reverse proxy | ASP.NET Core 10.0 + YARP 2.3.0 | Routes /api/*, /openapi/*, /scalar/*, /health* → Host.Api |
 | src/Backend/BuildingBlocks | Shared kernel | .NET 10.0 class libraries | Entity, ValueObject, AggregateRoot, OutboxMessage, OutboxBackgroundService<T> |
 | src/Backend/Modules/Catalog | Product catalog (reference) | .NET 10.0 class libraries | Full CRUD + ownership, OutboxMessages table |
-| src/Backend/Modules/Ordering | Order management (placeholder) | .NET 10.0 class libraries | Class1.cs stubs |
+| .template.config | dotnet new template | template.json | sourceName=MyProject, symbols: EnableJwt, ModuleName |
+| scripts/add-module.sh | Module scaffolder | Bash | Copies Catalog → new module, updates .slnx + .csproj |
+| .github/workflows | CI/CD | GitHub Actions | backend-ci.yml (build+test), backend-cd.yml (publish GHCR) |
 | src/Frontend | Frontend (placeholder) | Node/JS | Empty package.json |
 | tests/Backend.Tests | Test suite | xUnit + FluentAssertions + Testcontainers | 24 unit (InMemory) + 4 integration (real PostgreSQL) |
 | tests/Frontend.Tests | Frontend test placeholder | xUnit | — |
@@ -28,11 +30,6 @@ This is an **open-source template** for building modular monoliths in .NET 10.0.
               YARP        │  │     Catalog Module         │  │
                           │  │  Domain → App → Infra      │  │
                           │  │  Products + OutboxMessages │  │
-                          │  └───────────────────────────┘  │
-                          │  ┌───────────────────────────┐  │
-                          │  │    Ordering Module         │  │
-                          │  │  Domain → App → Infra      │  │
-                          │  │    (placeholder)           │  │
                           │  └───────────────────────────┘  │
                           │  ┌───────────────────────────┐  │
                           │  │      BuildingBlocks        │  │

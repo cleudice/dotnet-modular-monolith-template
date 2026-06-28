@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Open Source Contributors",
+  "classifications": ["Web", "API", "Modular Monolith", "Clean Architecture", "DDD"],
+  "description": "A .NET 10.0 modular monolith template with Clean Architecture, DDD tactical patterns, CQRS (no MediatR), Minimal APIs, EF Core + Dapper, FluentValidation, Outbox pattern, YARP reverse proxy, JWT auth, Serilog, and more. Catalog module included as reference implementation.",
+  "identity": "ModularMonolith.Template",
+  "name": "Modular Monolith (Clean Architecture + DDD + CQRS)",
+  "shortName": "modular-monolith",
+  "sourceName": "MyProject",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "preferNameDirectory": true,
+  "symbols": {
+    "EnableJwt": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Enable JWT Bearer authentication. If false, only X-User-Id header is used."
+    },
+    "ModuleName": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "Catalog",
+      "description": "Name of the first business module (default: Catalog). Use PascalCase, e.g. 'Orders' or 'Inventory'."
+    },
+    "skipRestore": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Skip dotnet restore after template creation."
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!EnableJwt)",
+          "exclude": [
+            "src/Backend/Host.Api/appsettings.json"
+          ]
+        }
+      ]
+    }
+  ],
+  "primaryOutputs": [
+    { "path": "MyProject.slnx" }
+  ],
+  "postActions": [
+    {
+      "id": "restore",
+      "condition": "(!skipRestore)",
+      "description": "Restore NuGet packages",
+      "manualInstructions": [
+        { "text": "Run 'dotnet restore'" }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

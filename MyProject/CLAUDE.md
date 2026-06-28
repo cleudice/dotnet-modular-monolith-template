@@ -1,5 +1,19 @@
 Leia AGENTS.md
 
+## Template
+
+```bash
+# Instalar template
+dotnet new install .
+
+# Criar novo projeto
+dotnet new modular-monolith -n MeuProjeto
+
+# Adicionar módulo
+cd MeuProjeto
+./scripts/add-module.sh Pedidos
+```
+
 ## Comandos
 
 ```bash

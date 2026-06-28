@@ -4,6 +4,8 @@
 
 ## Recipe: adding a new business module
 
+**Quick:** `./scripts/add-module.sh <ModuleName>` automates steps 1–5 below.
+
 ### 1. Create projects
 ```
 Modules/NewModule/
