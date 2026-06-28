@@ -3,45 +3,33 @@ Leia AGENTS.md
 ## Comandos
 
 ```bash
-# Build (raiz do repo)
 cd MyProject
-dotnet build src/Backend/MyProject.slnx
 
-# Testes
+# Build e testes
+dotnet build src/Backend/MyProject.slnx
 dotnet test src/Backend/MyProject.slnx
 
-# Executar local (2 terminais)
-# Terminal 1 — Host.Api (serviço interno, porta 5100)
-dotnet run --project src/Backend/Host.Api --launch-profile http
+# Executar tudo com Docker Compose (recomendado)
+docker compose up -d
 
-# Terminal 2 — ApiGateway (proxy YARP, porta 5000)
-dotnet run --project src/Backend/ApiGateway --launch-profile http
+# Ou executar localmente (2 terminais)
+dotnet run --project src/Backend/Host.Api --launch-profile http      # Terminal 1: :5100
+dotnet run --project src/Backend/ApiGateway --launch-profile http    # Terminal 2: :5000
 
-# Testar via gateway
+# Testar
 curl -H "X-User-Id: dev-user" http://localhost:5000/api/catalog/products
 ```
 
-## Pré-requisitos para execução
+## Pré-requisitos para execução local
 
 ```bash
-# 1. Subir PostgreSQL
+# PostgreSQL (pule se usar docker compose)
 docker run -d --name postgres-dev \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=myproject \
-  -p 5432:5432 \
-  postgres:17-alpine
+  -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=myproject -p 5432:5432 postgres:17-alpine
 
-# 2. Criar .env a partir do exemplo
-cd src/Backend/Host.Api
-cp .env.example .env
-
-# 3. Executar (2 terminais)
-dotnet run --launch-profile http                          # Terminal 1: Host.Api :5100
-dotnet run --project src/Backend/ApiGateway --launch-profile http  # Terminal 2: Gateway :5000
-
-# 4. Testar
-curl -H "X-User-Id: dev-user" http://localhost:5000/api/catalog/products
+# .env (pule se usar docker compose)
+cd src/Backend/Host.Api && cp .env.example .env
 ```
 
 Banco criado automaticamente via `EnsureCreated()` em Development.

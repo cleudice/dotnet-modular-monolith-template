@@ -18,6 +18,16 @@ An open-source .NET 10.0 modular monolith template with Clean Architecture, DDD 
 | src/Backend/Modules/Ordering | .NET 10.0 class libraries | Order management (placeholder — Class1.cs only) |
 | src/Frontend | Node/JS (placeholder) | Empty package.json — frontend stack not yet chosen |
 | tests/Backend.Tests | xUnit + FluentAssertions | 24 tests covering Catalog domain, validators, and repository |
+| .github/workflows | GitHub Actions | backend-ci.yml (build+test), backend-cd.yml (publish to GHCR), frontend-ci.yml (placeholder) |
+
+## Docker
+
+```bash
+docker compose up -d                # PostgreSQL + Host.Api + ApiGateway
+docker compose --profile dev up -d  # Dev mode with hot reload (future)
+```
+
+Ports: Gateway 5000, Host.Api 5100, PostgreSQL 5432.
 
 ## Where the context lives
 

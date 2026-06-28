@@ -10,16 +10,16 @@
 - **Domain event dispatch is a stub.** `AppDbContext.DispatchDomainEventsAsync()` collects and clears events but does nothing with them. When cross-module communication is needed, implement an `IDomainEventDispatcher` and inject it here.
 - **`X-User-Id` header is temporary.** Replace with JWT `sub` claim when real authentication is implemented. The `GetOwnerId()` helper in `CatalogEndpoints` is the single point to change.
 - **InMemory provider in tests does not enforce unique indexes.** `ProductRepositoryTests` passes but would fail against real PostgreSQL if SKU uniqueness is violated. Use Testcontainers for true integration tests.
-- **Connection string in user-secrets only.** After cloning, developers must run `dotnet user-secrets set "ConnectionStrings:Default" "..."` before the app starts.
+- **Connection string via `.env` file.** Copy `.env.example` to `.env` in `src/Backend/Host.Api/`. Falls back to user-secrets or environment variables. The `.env` file is gitignored.
 
 ## Tech debt
 
 | Area | Debt | Priority |
 |------|------|----------|
 | Ordering module | Class1.cs placeholders — no implementation | Low (template placeholder) |
-| ApiGateway | ~~Weather forecast boilerplate — should be YARP reverse proxy~~ ✅ Done — YARP 2.3.0, routes `/api/*` to Host.Api:5085 | — |
-| Docker | All Dockerfiles and docker-compose.yml are empty | Medium |
-| CI/CD | GitHub Actions workflow files are empty | Medium |
+| ApiGateway | ~~Weather forecast boilerplate~~ ✅ YARP 2.3.0, routes `/api/*`, `/openapi/*`, `/scalar/*` to Host.Api | — |
+| Docker | ~~Empty~~ ✅ Multi-stage Dockerfiles (Host.Api, ApiGateway), docker-compose.yml funcional | — |
+| CI/CD | ~~Empty~~ ✅ backend-ci.yml (build+test), backend-cd.yml (publish GHCR) | — |
 | Frontend | package.json is empty — stack not chosen | Low |
 | Health checks | Not implemented | Medium |
 | CORS | Not configured | Medium (needed when frontend is added) |

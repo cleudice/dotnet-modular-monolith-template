@@ -1,0 +1,102 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'MyProject/src/Backend/**'
+      - 'MyProject/tests/Backend.Tests/**'
+      - 'MyProject/Directory.Build.props'
+      - 'MyProject/Directory.Packages.props'
+      - 'MyProject/global.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'MyProject/src/Backend/**'
+      - 'MyProject/tests/Backend.Tests/**'
+      - 'MyProject/Directory.Build.props'
+      - 'MyProject/Directory.Packages.props'
+      - 'MyProject/global.json'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: MyProject
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: myproject_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: MyProject/global.json
+
+      - name: Restore dependencies
+        run: dotnet restore src/Backend/MyProject.slnx
+
+      - name: Build
+        run: dotnet build src/Backend/MyProject.slnx --no-restore --configuration Release
+
+      - name: Test
+        run: >
+          dotnet test src/Backend/MyProject.slnx
+          --no-build
+          --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory TestResults
+          --
+          RunConfiguration.CollectSourceInformation=true
+        env:
+          ConnectionStrings__Default: >-
+            Host=localhost;Port=5432;Database=myproject_test;Username=postgres;Password=postgres
+
+      - name: Upload coverage
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: MyProject/TestResults/**/coverage.*
+          retention-days: 7
+
+  summary:
+    name: CI summary
+    needs: [build]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Result
+        run: |
+          if [ "${{ needs.build.result }}" = "success" ]; then
+            echo "✅ Backend CI passed"
+          else
+            echo "❌ Backend CI failed"
+            exit 1
+          fi

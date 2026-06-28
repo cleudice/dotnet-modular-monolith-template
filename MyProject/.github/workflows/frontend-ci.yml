@@ -1,0 +1,22 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'MyProject/src/Frontend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'MyProject/src/Frontend/**'
+
+jobs:
+  placeholder:
+    name: Frontend (placeholder)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Frontend stack not yet chosen
+        run: echo "No frontend build steps yet. Add when stack is selected."
